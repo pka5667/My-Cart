@@ -1,0 +1,76 @@
+{% extends 'shop/base.html' %} {% block title %} Contact Us {% endblock title %}
+{% block body %}
+
+<div class="container my-4">
+    <h3 class="my-4">Contact Us</h3>
+    <form action="/shop/contact" method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="contact-form-name" name="name" placeholder="Enter your Name"
+                required />
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email address</label>
+            <input type="email" class="form-control" id="contact-form-email" name="email" placeholder="name@example.com"
+                required />
+        </div>
+        <div class="mb-3">
+            <label for="phone" class="form-label">Phone</label>
+            <input type="tel" class="form-control" id="contact-form-phone" name="phone"
+                placeholder="Enter your mobile number" />
+        </div>
+        <div class="mb-3">
+            <label for="textarea" class="form-label">How may we help you</label>
+            <textarea class="form-control" id="contact-form-txtarea" name="txtarea" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-success">Submit</button>
+    </form>
+</div>
+
+<div class="container">
+    <div class="row">
+        <a id="openPopupBtn" class="btn btn-primary" data-toggle="modal" href="#ignismyModal" hidden>open Popup</a>
+        <div class="modal fade" id="ignismyModal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="" onclick='window.open("/shop/","_self")'>
+                            <span>×</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="thank-you-pop">
+                            <img src="http://goactionstations.co.uk/wp-content/uploads/2017/03/Green-Round-Tick.png"
+                                alt="" />
+                            <h1>Thank You!</h1>
+                            <p>Your submission is received and we will contact you soon</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% block js %}
+
+<script>
+    //highlight active tab from here
+    $("#nav-contact").addClass("active")
+</script>
+
+{% if formSubmitted == 'True' %}
+<script>
+    $(document).ready(function(){
+        $("#openPopupBtn").click();
+    })
+    
+    //to prevent from confirm for resubmission to send same data again and again
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+</script>
+{% endif %}
+{% endblock js %}
+ {% endblock body %}

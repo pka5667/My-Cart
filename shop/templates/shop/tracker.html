@@ -1,0 +1,108 @@
+{% extends 'shop/base.html' %}
+{% block title%} Checkout{% endblock %}
+{% block body %}
+<div class="container">
+    <div class="col my-4">
+        <h2>Enter Your email id and order id to track order</h2>
+        <div class="my-4">
+            <form class="my-4" method="POST" action="#" id="trackerForm">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="inputname">Order Id</label>
+                        <input type="Number" class="form-control" id="inputorderId" name="order_id"
+                            placeholder="Order Id">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="inputEmail4">Email</label>
+                        <input type="email" class="form-control" id="inputEmail4" name="email" placeholder="Email">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Track Order</button>
+            </form>
+        </div>
+    </div>
+    <div id="orderItems-div" class="col my-4">
+        <h2>Your Ordered Items</h2>
+        <ul class="list-group" id="cart-items">
+
+        </ul>
+    </div>
+    <div id="orderStatus-div" class="col my-4">
+        <h2>Your Order Status</h2>
+        <ul class="list-group" id="order_update-items">
+
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block js %}
+<script>
+    //highlight active tab from here
+    $("#nav-tracker").addClass("active")
+    $("#orderStatus-div").hide();
+    $("#orderItems-div").hide();
+
+
+    $('#trackerForm').submit(function () {
+        $("#items").empty();
+        var formData = {
+            'order_id': $('input[name=order_id]').val(),
+            'email': $('input[name=email]').val(),
+            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+        };
+
+
+        $.ajax({
+            type: 'POST',
+            url: '/shop/tracker',
+            data: formData,
+            encode: true
+        })
+            .done(function (data) {
+                data = JSON.parse(data);
+                var updates = data[0];
+                $("#orderItems-div").hide();
+                $('#order_update-items').empty();
+                $('#cart-items').empty();
+                if (updates != undefined && updates != {}) {
+                    if (updates.length > 0) {
+                        for (i = 0; i < updates.length; i++) {
+                            let desc = updates[i]["update_description"];
+                            let time = updates[i]["timeStamp"];
+                            var myStr = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                            ${desc}
+                            <span class="badge badge-primary badge-pill">${time}</span>
+                        </li>`;
+                            $("#order_update-items").append(myStr);
+                        }
+                        
+                        cart = JSON.parse(data[1]);
+                        console.log(cart);
+                        for (var item in cart) {
+                            let name = cart[item][1];
+                            let qty = cart[item][0];
+                            var myStr = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                                ${name}
+                                <span class="badge badge-primary badge-pill">${qty}</span>
+                            </li>`
+                            $('#cart-items').append(myStr);
+                        }
+                        $("#orderItems-div").show();
+                    }
+                } else {
+                    var myStr = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                        Sorry, we are unable to fetch this order id and email. Make sure to  enter correct email and order id.
+                    </li>`
+                    $('#order_update-items').append(myStr);
+                }
+
+                $("#orderStatus-div").show();
+            });
+        event.preventDefault();
+    });
+</script>
+
+{% endblock js %}
