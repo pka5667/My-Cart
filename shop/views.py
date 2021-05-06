@@ -21,7 +21,7 @@ def index(request):
     for catg in uniqueCategories:
         product = Product.objects.filter(category=catg)
         n = len(product)
-        numSlides = n // 4 + ceil(n / 4 - n // 4)
+        numSlides = n // 4 if (n % 4 == 0) else ((n // 4) + 1)
         allProducts.append([product, range(1, numSlides), numSlides])
     params = {'allProducts': allProducts}
     return render(request, "shop/index.html", params)
